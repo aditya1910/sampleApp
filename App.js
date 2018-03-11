@@ -4,6 +4,7 @@ import { StackNavigator } from 'react-navigation'; // Version can be specified i
 import DatePicker from 'react-native-datepicker';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 import CheckBox from 'react-native-checkbox';
+var request = new XMLHttpRequest();
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -260,10 +261,28 @@ class SocialInfo extends React.Component {
   }
 
   _submitData() {
-    console.log(this.state);
-    console.log(this.props.navigation.state);
-    Alert.alert('Your data is saved successfully');
-    this.props.navigation.navigate('Home')
+    
+    let data={}
+    let {params} = this.props.navigation.state;
+    data.personalData = params.personalData;
+    data.workData     = params.workData;
+    data.educationData= params.educationData;
+    data.socialData   = {...this.state};
+    console.log(data);
+
+    fetch('http://192.168.1.6:3000/userProfile', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({data:data}),
+      }).then((response)=>{
+        Alert.alert('Your data is saved successfully');
+        this.props.navigation.navigate('Home')
+      }).catch((error)=>{
+        console.log("some error occured",error);
+      });
   }
 
   render() {
